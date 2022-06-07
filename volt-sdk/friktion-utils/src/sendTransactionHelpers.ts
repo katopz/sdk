@@ -1,5 +1,4 @@
 /* eslint-disable */
-import { WalletAdapter } from "@friktion-labs/entropy-client";
 import {
   Account,
   Commitment,

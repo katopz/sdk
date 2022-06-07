@@ -1,16 +1,17 @@
-import { VoltSDK, ConnectedVoltSDK, FriktionSDK } from "../src";
+import { VoltSDK, ConnectedVoltSDK, FriktionSDK } from "../volt-sdk/src";
 import * as anchor from "@project-serum/anchor";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import type { Signer } from "@solana/web3.js";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { Command } from "commander";
 import Decimal from "decimal.js";
 
 import { sendIns, wait } from "./utils";
+import { ProviderLike } from "../volt-sdk/src/miscUtils";
+import { Wallet } from "@project-serum/anchor";
 
 const cli = new Command();
 
@@ -37,31 +38,41 @@ cli
   .parse(process.argv);
 
 // set up provider and programs
-// const PROVIDER_URL = "https://api.devnet.solana.com";
-// const PROVIDER_URL = "https://solana-api.projectserum.com";
-const PROVIDER_URL = "https://api.mainnet-beta.solana.com";
-const provider = new anchor.Provider(
-  new Connection(PROVIDER_URL),
-  anchor.getProvider().wallet,
-  {}
-);
-const user = (provider.wallet as anchor.Wallet).payer;
+// process.env.ANCHOR_PROVIDER_URL = "https://api.mainnet-beta.solana.com";
+process.env.ANCHOR_PROVIDER_URL = "https://api.devnet.solana.com";
+const provider = anchor.AnchorProvider.env();
+const wallet = provider.wallet as Wallet;
+anchor.setProvider(provider);
+
+const user = (wallet).payer;
 const connection = provider.connection;
 
 const DELAY_MS = 5000;
 
-const instruction = cli.instruction;
+const options = cli.opts();
+const instruction = options.instruction;
+const providerLike = {
+  wallet,
+  connection,
+} as ProviderLike
 
 const run = async () => {
   const fSdk = new FriktionSDK({
-    provider: provider,
-    network: "mainnet-beta",
+    provider: providerLike,
+    // network: "mainnet-beta",
+    network: "devnet",
   });
 
-  const voltKey = new PublicKey(cli.volt);
+  const voltKey = new PublicKey(options.volt);
   const vv = await fSdk.loadVoltByKey(voltKey);
+  const wallet = anchor.Wallet.local();
 
-  const cSdk = new ConnectedVoltSDK(provider, vv);
+  const cSdk = new ConnectedVoltSDK(
+    connection,
+    wallet.publicKey,
+    await fSdk.loadVoltByKey(voltKey),
+    undefined
+  );
 
   const underlyingToken = new Token(
     connection,
@@ -159,10 +170,10 @@ const run = async () => {
   );
 
   if (instruction === "printDeposits") {
-    const pubkey = new PublicKey(cli.pubkey);
+    const pubkey = new PublicKey(options.pubkey);
 
     let voltsToPrint: VoltSDK[] = [];
-    if (cli.allVolts) {
+    if (options.allVolts) {
       voltsToPrint = await fSdk.getAllVoltVaults();
     } else {
       voltsToPrint = [vv];
@@ -237,7 +248,7 @@ const run = async () => {
       ).amount.toString()
     );
 
-    const depositAmount = new Decimal(cli.amount);
+    const depositAmount = new Decimal(options.amount);
 
     const depositIx = await cSdk.deposit(
       depositAmount,
@@ -245,7 +256,7 @@ const run = async () => {
       vaultTokenAccount
     );
 
-    await sendIns(provider, depositIx);
+    await sendIns(provider, depositIx, user);
 
     await wait(DELAY_MS);
 
@@ -273,7 +284,7 @@ const run = async () => {
       (await vaultToken.getAccountInfo(vaultTokenAccount)).amount.toString()
     );
 
-    const withdrawAmountInVaultTokens = new Decimal(cli.amount)
+    const withdrawAmountInVaultTokens = new Decimal(options.amount)
       .mul(new Decimal((await vaultToken.getMintInfo()).supply.toString()))
       .div(
         new Decimal(
@@ -297,7 +308,7 @@ const run = async () => {
     );
     console.log(
       "withdraw amount: ",
-      cli.amount,
+      options.amount,
       "(",
       withdrawAmountInVaultTokensNormalized.toString(),
       "w/ no decimals) volt tokens"
@@ -309,7 +320,7 @@ const run = async () => {
       underlyingTokenAccount
     );
 
-    await sendIns(provider, withdrawIx);
+    await sendIns(provider, withdrawIx, user);
 
     await wait(DELAY_MS);
 
@@ -334,7 +345,7 @@ const run = async () => {
 
     const claimPendingIx = await cSdk.claimPending(vaultTokenAccount);
 
-    await sendIns(provider, claimPendingIx);
+    await sendIns(provider, claimPendingIx, user);
 
     await sendIns;
     console.log(
@@ -358,7 +369,7 @@ const run = async () => {
       underlyingTokenAccount
     );
 
-    await sendIns(provider, claimPendingWithdrawalIx);
+    await sendIns(provider, claimPendingWithdrawalIx, user);
 
     console.log(
       "underlying tokens after = ",

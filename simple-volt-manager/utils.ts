@@ -1,4 +1,4 @@
-import { REFERRAL_AUTHORITY } from "../src";
+import { REFERRAL_AUTHORITY } from "../volt-sdk/src";
 import type * as anchor from "@project-serum/anchor";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -25,13 +25,14 @@ export const getBalanceOrZero = async (
 
 export const sendIns = async (
   provider: anchor.Provider,
-  ins: TransactionInstruction
+  ins: TransactionInstruction,
+  signer: anchor.web3.Keypair,
 ) => {
   const tx = new Transaction();
 
   tx.add(ins);
 
-  await provider.send(tx);
+  await provider.connection.sendTransaction(tx, [signer]);
 };
 
 const getFeeTokenAccount = async (volt: VoltVaultWithKey) => {

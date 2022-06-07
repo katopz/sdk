@@ -1,8 +1,7 @@
 import * as anchor from "@project-serum/anchor";
-import { ProgramAccount } from "@project-serum/anchor";
-import { OpenOrders } from "@project-serum/serum";
+import { ProgramAccount, Wallet } from "@project-serum/anchor";
 import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { Command } from "commander";
 import { VoltVault, VoltVaultWithKey } from "./types";
 import * as VoltIDLJsonRaw from "./volt.json";
@@ -20,42 +19,43 @@ cli
   .parse(process.argv);
 
 (async () => {
-    const PROVIDER_URL = "https://api.devnet.solana.com";
-//   const PROVIDER_URL = "https://solana-api.projectserum.com";
-  const provider = new anchor.Provider(
-    new Connection(PROVIDER_URL),
-    anchor.Wallet.local(),
-    {}
-  );
-  const connection = provider.connection;
-const friktionProgram = new anchor.Program(
+  // set up provider and programs
+  // process.env.ANCHOR_PROVIDER_URL = "https://api.mainnet-beta.solana.com";
+  process.env.ANCHOR_PROVIDER_URL = "https://api.devnet.solana.com";
+  const provider = anchor.AnchorProvider.env();
+  const wallet = provider.wallet as Wallet;
+  anchor.setProvider(provider);
+
+  const friktionProgram = new anchor.Program(
     VoltIDLJsonRaw as any,
     new PublicKey("VoLT1mJz1sbnxwq5Fv2SXjdVDgPXrb9tJyC8WpMDkSp"),
     provider
-);
-let voltVaults: VoltVaultWithKey[];
-  const user = (provider.wallet as anchor.Wallet).payer;
-  if (!cli.match) voltVaults = ((await friktionProgram?.account?.voltVault?.all()) as unknown as ProgramAccount<VoltVault>[])
-                            .map(
-                                (acct) => ({
-                                    ...acct.account,
-                                    voltKey: acct.publicKey,
-                                  })
-                            );
+  );
+  let voltVaults: VoltVaultWithKey[];
+  const user = (wallet).payer;
+
+  const options = cli.opts();
+  if (!options.match) voltVaults = ((await friktionProgram?.account?.voltVault?.all()) as unknown as ProgramAccount<VoltVault>[])
+    .map(
+      (acct) => ({
+        ...acct.account,
+        voltKey: acct.publicKey,
+      })
+    );
   else {
-      const temp = (await friktionProgram.account.voltVault?.fetch(new PublicKey(cli.match as string))) as VoltVault;
-      voltVaults = [
-        {
-            ...temp,
-            voltKey: new PublicKey(cli.match)
-        }
+    const temp = (await friktionProgram.account.voltVault?.fetch(new PublicKey(options.match as string))) as VoltVault;
+    voltVaults = [
+      {
+        ...temp,
+        voltKey: new PublicKey(options.match)
+      }
     ]
-}
+  }
 
 
-  console.log("match = ", cli.match);
+  console.log("match = ", options.match);
   for (const vv of voltVaults) {
-    if (cli.match !== undefined && !vv.voltKey.toString().includes(cli.match)) {
+    if (options.match !== undefined && !vv.voltKey.toString().includes(options.match)) {
       // console.log("skipping since does not match");
       continue;
     }
@@ -63,10 +63,10 @@ let voltVaults: VoltVaultWithKey[];
     console.log("volt: ", vv.voltKey.toString());
 
     console.log(
-        "General Info\n --------------",
-        "\n, underlying asset mint: ", vv.underlyingAssetMint.toString(),
-        "\n, quote asset mint: ", vv.quoteAssetMint.toString()
-      )
+      "General Info\n --------------",
+      "\n, underlying asset mint: ", vv.underlyingAssetMint.toString(),
+      "\n, quote asset mint: ", vv.quoteAssetMint.toString()
+    )
 
     const underlyingToken = new Token(
       provider.connection,
