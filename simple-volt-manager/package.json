@@ -6,8 +6,8 @@
   "author": "bigdefidev <bigdefidev@protonmail.com>",
   "license": "MIT",
   "scripts": {
-    "print": "ANCHOR_WALLET=$(solana config get keypair | cut -d' ' -f3) ts-node printVolts.ts",
-    "friktion": "ANCHOR_WALLET=$(solana config get keypair | cut -d' ' -f3) ts-node simple-volt.ts"
+    "print": "ANCHOR_WALLET=$(solana config get keypair | cut -d' ' -f3) npx ts-node printVolts.ts",
+    "friktion": "ANCHOR_WALLET=$(solana config get keypair | cut -d' ' -f3) npx ts-node simple-volt.ts"
   },
   "dependencies": {
     "@project-serum/anchor": "^0.24.2",
