@@ -1656,10 +1656,7 @@ export class VoltSDK {
       await this.getVoltValueInDepositToken(normFactor)
     ).mul(normFactor);
 
-    console.log('voltVault.roundNumber:', voltVault.roundNumber.toNumber())
     const roundInfo = await this.getRoundByNumber(voltVault.roundNumber);
-    console.log('roundInfo:', roundInfo)
-
     const voltTokenSupply = new Decimal(
       vaultTokenMintInfo.supply.toString()
     ).add(new Decimal(roundInfo.voltTokensFromPendingWithdrawals.toString()));
@@ -2343,7 +2340,6 @@ export class VoltSDK {
         this.sdk.programs.Volt.programId
       )
     )[0];
-    console.log('key:', key.toBase58())
     return this.getRoundByKey(key);
   }
 

@@ -72,7 +72,7 @@ cli
   const vv = await fSdk.loadVoltByKey(voltVault.voltKey);
 
   console.log('voltVault:', JSON.stringify(voltVault, null, 2));
-  console.log('vv:', vv);
+  console.log('vv:', vv.voltKey.toString());
 
   let voltsToPrint: VoltSDK[] = [];
   if (options.allVolts) {
@@ -84,8 +84,6 @@ cli
   for (const voltSdk of voltsToPrint) {
     try {
       const structOrNull = await voltSdk.getBalancesForUser(pubkey);
-
-      console.log('structOrNull:', JSON.stringify(structOrNull, null, 2));
 
       if (!structOrNull) {
         console.log("skipping...");
