@@ -7,7 +7,7 @@ import Decimal from "decimal.js";
 import { FriktionSDK, VoltSDK } from "../volt-sdk/src";
 import { ProviderLike } from "../volt-sdk/src/miscUtils";
 import { VoltVault, VoltVaultWithKey } from "./types";
-import * as VoltIDLJsonRaw from "./volt.json";
+import * as VoltIDLJsonRaw from "../volt-abi/target/idl/volt_abi.json";
 
 const cli = new Command();
 
