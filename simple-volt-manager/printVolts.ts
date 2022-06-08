@@ -3,6 +3,9 @@ import { ProgramAccount, Wallet } from "@project-serum/anchor";
 import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { Command } from "commander";
+import Decimal from "decimal.js";
+import { FriktionSDK, VoltSDK } from "../volt-sdk/src";
+import { ProviderLike } from "../volt-sdk/src/miscUtils";
 import { VoltVault, VoltVaultWithKey } from "./types";
 import * as VoltIDLJsonRaw from "./volt.json";
 
@@ -16,12 +19,13 @@ cli
     "-m, --match <string>",
     "set of characters to match volt address against"
   )
+  .option("--pubkey <string>", "pubkey to print information for")
   .parse(process.argv);
 
 (async () => {
   // set up provider and programs
-  // process.env.ANCHOR_PROVIDER_URL = "https://api.mainnet-beta.solana.com";
-  process.env.ANCHOR_PROVIDER_URL = "https://api.devnet.solana.com";
+  process.env.ANCHOR_PROVIDER_URL = "https://api.mainnet-beta.solana.com";
+  // process.env.ANCHOR_PROVIDER_URL = "https://api.devnet.solana.com";
   const provider = anchor.AnchorProvider.env();
   const wallet = provider.wallet as Wallet;
   anchor.setProvider(provider);
@@ -32,7 +36,6 @@ cli
     provider
   );
   let voltVaults: VoltVaultWithKey[];
-  const user = (wallet).payer;
 
   const options = cli.opts();
   if (!options.match) voltVaults = ((await friktionProgram?.account?.voltVault?.all()) as unknown as ProgramAccount<VoltVault>[])
@@ -52,57 +55,84 @@ cli
     ]
   }
 
+  const connection = provider.connection;
+  const pubkey = new PublicKey(options.pubkey);
+  const providerLike = {
+    wallet,
+    connection,
+  } as ProviderLike
+  const fSdk = new FriktionSDK({
+    provider: providerLike,
+    network: "mainnet-beta",
+    // network: "devnet",
+  });
 
   console.log("match = ", options.match);
-  for (const vv of voltVaults) {
-    if (options.match !== undefined && !vv.voltKey.toString().includes(options.match)) {
-      // console.log("skipping since does not match");
-      continue;
+  const voltVault = voltVaults.find((v) => v.voltKey.toString() === options.match);
+  const vv = await fSdk.loadVoltByKey(voltVault.voltKey);
+
+  console.log('voltVault:', JSON.stringify(voltVault, null, 2));
+  console.log('vv:', vv);
+
+  let voltsToPrint: VoltSDK[] = [];
+  if (options.allVolts) {
+    voltsToPrint = await fSdk.getAllVoltVaults();
+  } else {
+    voltsToPrint = [vv];
+  }
+
+  for (const voltSdk of voltsToPrint) {
+    try {
+      const structOrNull = await voltSdk.getBalancesForUser(pubkey);
+
+      console.log('structOrNull:', JSON.stringify(structOrNull, null, 2));
+
+      if (!structOrNull) {
+        console.log("skipping...");
+        continue;
+      }
+
+      const {
+        totalBalance,
+        normalBalance,
+        pendingDeposits,
+        pendingWithdrawals,
+        mintableShares,
+        claimableUnderlying,
+        normFactor,
+        vaultNormFactor,
+      } = structOrNull;
+
+      console.log("struct: ", structOrNull);
+      if (totalBalance.gt(0)) {
+        console.log("volt = ", voltSdk.voltKey.toString());
+
+        console.log(
+          "underlying mint = ",
+          voltSdk.voltVault.underlyingAssetMint.toString()
+        );
+        console.log(
+          "quote mint = ",
+          voltSdk.voltVault.quoteAssetMint.toString()
+        );
+
+        console.log(
+          "total balance: ",
+          new Decimal(totalBalance.toString()).div(normFactor),
+          "normal balance (from vault tokens): ",
+          new Decimal(normalBalance.toString()).div(normFactor),
+          "pending deposit balance: ",
+          new Decimal(pendingDeposits.toString()).div(normFactor),
+          "pending withdrawal balance: ",
+          new Decimal(pendingWithdrawals.toString()).div(normFactor),
+          "mintable shares: ",
+          mintableShares.div(vaultNormFactor).toString(),
+          "claimable underlying: ",
+          claimableUnderlying.div(normFactor).toString()
+        );
+      }
+    } catch (err) {
+      console.log(err);
     }
-
-    console.log("volt: ", vv.voltKey.toString());
-
-    console.log(
-      "General Info\n --------------",
-      "\n, underlying asset mint: ", vv.underlyingAssetMint.toString(),
-      "\n, quote asset mint: ", vv.quoteAssetMint.toString()
-    )
-
-    const underlyingToken = new Token(
-      provider.connection,
-      vv.underlyingAssetMint,
-      TOKEN_PROGRAM_ID,
-      user
-    );
-
-    const vaultToken = new Token(
-      provider.connection,
-      vv.vaultMint,
-      TOKEN_PROGRAM_ID,
-      user
-    );
-
-    const quoteToken = new Token(
-      provider.connection,
-      vv.quoteAssetMint,
-      TOKEN_PROGRAM_ID,
-      user
-    );
-
-    const optionToken = new Token(
-      provider.connection,
-      vv.optionMint,
-      TOKEN_PROGRAM_ID,
-      user
-    );
-
-    const writerToken = new Token(
-      provider.connection,
-      vv.writerTokenMint,
-      TOKEN_PROGRAM_ID,
-      user
-    );
-
-
   }
 })()
