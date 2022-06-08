@@ -331,7 +331,7 @@
     lodash.mapvalues "^4.6.0"
     tslib "^2.4.0"
 
-"@saberhq/chai-solana@^1.13.27":
+"@saberhq/chai-solana@1.13.27":
   version "1.13.27"
   resolved "https://registry.yarnpkg.com/@saberhq/chai-solana/-/chai-solana-1.13.27.tgz#2da10a146945d335fe1f6ba476ccd56614a0cc79"
   integrity sha512-CFrzRRD7D1/sL7gr4fhX4wM7KNKFlJZKzc/sS/Clc/x4Oai2OzlxHF0KGuUuomZQqKvgf5LFKQx/8JXYRun1Yw==
