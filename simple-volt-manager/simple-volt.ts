@@ -38,8 +38,8 @@ cli
   .parse(process.argv);
 
 // set up provider and programs
-// process.env.ANCHOR_PROVIDER_URL = "https://api.mainnet-beta.solana.com";
-process.env.ANCHOR_PROVIDER_URL = "https://api.devnet.solana.com";
+process.env.ANCHOR_PROVIDER_URL = "https://api.mainnet-beta.solana.com";
+// process.env.ANCHOR_PROVIDER_URL = "https://api.devnet.solana.com";
 const provider = anchor.AnchorProvider.env();
 const wallet = provider.wallet as Wallet;
 anchor.setProvider(provider);
@@ -59,8 +59,8 @@ const providerLike = {
 const run = async () => {
   const fSdk = new FriktionSDK({
     provider: providerLike,
-    // network: "mainnet-beta",
-    network: "devnet",
+    network: "mainnet-beta",
+    // network: "devnet",
   });
 
   const voltKey = new PublicKey(options.volt);
@@ -74,6 +74,77 @@ const run = async () => {
     undefined
   );
 
+  // Read only
+
+  if (instruction === "printDeposits") {
+    const pubkey = new PublicKey(options.pubkey);
+
+    let voltsToPrint: VoltSDK[] = [];
+    if (options.allVolts) {
+      voltsToPrint = await fSdk.getAllVoltVaults();
+    } else {
+      voltsToPrint = [vv];
+    }
+
+    console.log(voltsToPrint);
+
+    for (const voltSdk of voltsToPrint) {
+      try {
+        const structOrNull = await voltSdk.getBalancesForUser(pubkey);
+
+        if (!structOrNull) {
+          console.log("skipping...");
+          continue;
+        }
+
+        const {
+          totalBalance,
+          normalBalance,
+          pendingDeposits,
+          pendingWithdrawals,
+          mintableShares,
+          claimableUnderlying,
+          normFactor,
+          vaultNormFactor,
+        } = structOrNull;
+
+        console.log("struct: ", structOrNull);
+        if (totalBalance.gt(0)) {
+          console.log("volt = ", voltSdk.voltKey.toString());
+
+          console.log(
+            "underlying mint = ",
+            voltSdk.voltVault.underlyingAssetMint.toString()
+          );
+          console.log(
+            "quote mint = ",
+            voltSdk.voltVault.quoteAssetMint.toString()
+          );
+
+          console.log(
+            "total balance: ",
+            new Decimal(totalBalance.toString()).div(normFactor),
+            "normal balance (from vault tokens): ",
+            new Decimal(normalBalance.toString()).div(normFactor),
+            "pending deposit balance: ",
+            new Decimal(pendingDeposits.toString()).div(normFactor),
+            "pending withdrawal balance: ",
+            new Decimal(pendingWithdrawals.toString()).div(normFactor),
+            "mintable shares: ",
+            mintableShares.div(vaultNormFactor).toString(),
+            "claimable underlying: ",
+            claimableUnderlying.div(normFactor).toString()
+          );
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    return;
+  }
+
+  // Write
   const underlyingToken = new Token(
     connection,
     vv.voltVault.underlyingAssetMint,
@@ -169,73 +240,7 @@ const run = async () => {
     user.publicKey
   );
 
-  if (instruction === "printDeposits") {
-    const pubkey = new PublicKey(options.pubkey);
-
-    let voltsToPrint: VoltSDK[] = [];
-    if (options.allVolts) {
-      voltsToPrint = await fSdk.getAllVoltVaults();
-    } else {
-      voltsToPrint = [vv];
-    }
-
-    console.log(voltsToPrint);
-
-    for (const voltSdk of voltsToPrint) {
-      try {
-        const structOrNull = await voltSdk.getBalancesForUser(pubkey);
-
-        if (!structOrNull) {
-          console.log("skipping...");
-          continue;
-        }
-
-        const {
-          totalBalance,
-          normalBalance,
-          pendingDeposits,
-          pendingWithdrawals,
-          mintableShares,
-          claimableUnderlying,
-          normFactor,
-          vaultNormFactor,
-        } = structOrNull;
-
-        console.log("struct: ", structOrNull);
-        if (totalBalance.gt(0)) {
-          console.log("volt = ", voltSdk.voltKey.toString());
-
-          console.log(
-            "underlying mint = ",
-            voltSdk.voltVault.underlyingAssetMint.toString()
-          );
-          console.log(
-            "quote mint = ",
-            voltSdk.voltVault.quoteAssetMint.toString()
-          );
-
-          console.log(
-            "total balance: ",
-            new Decimal(totalBalance.toString()).div(normFactor),
-            "normal balance (from vault tokens): ",
-            new Decimal(normalBalance.toString()).div(normFactor),
-            "pending deposit balance: ",
-            new Decimal(pendingDeposits.toString()).div(normFactor),
-            "pending withdrawal balance: ",
-            new Decimal(pendingWithdrawals.toString()).div(normFactor),
-            "mintable shares: ",
-            mintableShares.div(vaultNormFactor).toString(),
-            "claimable underlying: ",
-            claimableUnderlying.div(normFactor).toString()
-          );
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    return;
-  } else if (instruction === "deposit") {
+  if (instruction === "deposit") {
     console.log(
       "pre-deposit vault token balance = ",
       (await vaultToken.getAccountInfo(vaultTokenAccount)).amount.toString()
