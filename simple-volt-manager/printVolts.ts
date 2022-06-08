@@ -1,6 +1,5 @@
 import * as anchor from "@project-serum/anchor";
 import { ProgramAccount, Wallet } from "@project-serum/anchor";
-import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { Command } from "commander";
 import Decimal from "decimal.js";
