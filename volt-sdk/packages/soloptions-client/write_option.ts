@@ -2,11 +2,9 @@ import * as anchor from "@project-serum/anchor";
 import { PublicKey, Keypair, SYSVAR_CLOCK_PUBKEY } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
-  SoloptionsContract,
   SoloptionsContractWithKey,
   SoloptionsProgram,
 } from "../../src/programs/Soloptions/soloptionsTypes";
-import { AnchorProvider } from "@project-serum/anchor";
 
 export interface WriteOptionParams {
   writerAccount?: Keypair;
@@ -44,7 +42,7 @@ export const writeOption = async (
       writerTokenDestination,
       writerAuthority: writerAccount
         ? writerAccount.publicKey
-        : (program.provider as AnchorProvider).wallet.publicKey,
+        : (program.provider as anchor.AnchorProvider).wallet.publicKey,
       userUnderlyingFundingTokens: writerUnderlyingFundingTokens,
 
       feeDestination,

@@ -124,8 +124,8 @@ export class SpreadsSDK {
     this.network = !opts.network
       ? "mainnet-beta"
       : opts.network === "testnet" || opts.network === "localnet"
-      ? "mainnet-beta"
-      : opts.network;
+        ? "mainnet-beta"
+        : opts.network;
 
     const spreadsIdl = OTHER_IDLS.Spreads;
     if (!spreadsIdl) {
@@ -213,7 +213,7 @@ export class SpreadsSDK {
       underlyingAmountSell,
       quoteAmountSell,
       expiryTs,
-      isCall ? new u64(1) : new u64(0),
+      isCall ? new BN(1) : new BN(0),
       {
         accounts: initializeAccounts,
       }
@@ -391,10 +391,10 @@ export class SpreadsSDK {
         textEncoder.encode(kind),
         underlyingMint.toBuffer(),
         quoteMint.toBuffer(),
-        new u64(underlyingAmount.toString()).toBuffer(),
-        new u64(quoteAmount.toString()).toBuffer(),
-        new u64(expiry.toString()).toBuffer(),
-        isCall ? new u64(1).toBuffer() : new u64(0).toBuffer(),
+        underlyingAmount.toBuffer(),
+        quoteAmount.toBuffer(),
+        expiry.toBuffer(),
+        isCall ? new BN(1).toBuffer() : new BN(0).toBuffer(),
       ],
       program.programId
     );
@@ -478,12 +478,12 @@ export class SpreadsSDK {
         textEncoder.encode("SpreadsContract"),
         underlyingMint.toBuffer(),
         quoteMint.toBuffer(),
-        new u64(underlyingAmountBuy.toString()).toBuffer(),
-        new u64(quoteAmountBuy.toString()).toBuffer(),
-        new u64(underlyingAmountSell.toString()).toBuffer(),
-        new u64(quoteAmountSell.toString()).toBuffer(),
-        new u64(expiryTs.toString()).toBuffer(),
-        new u64(isCall.toString()).toBuffer(),
+        underlyingAmountBuy.toBuffer(),
+        quoteAmountBuy.toBuffer(),
+        underlyingAmountSell.toBuffer(),
+        quoteAmountSell.toBuffer(),
+        expiryTs.toBuffer(),
+        isCall.toBuffer(),
       ],
       spreadsProgramId
     );

@@ -36,9 +36,7 @@ export const writeOption = async (
     accounts: {
       contract: contract.key,
       optionMint: contract.optionMint,
-      quoteMint: contract.quoteMint,
       optionTokenDestination,
-      underlyingMint: contract.underlyingMint,
       underlyingPool: contract.underlyingPool,
       writerMint: contract.writerMint,
       writerTokenDestination,

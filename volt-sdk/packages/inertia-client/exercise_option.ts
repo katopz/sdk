@@ -5,8 +5,7 @@ import {
   InertiaContractWithKey,
   InertiaProgram,
 } from "../../src/programs/Inertia/inertiaTypes";
-import { getProgramAddress } from "./util";
-
+import { InertiaSDK } from "../../src";
 interface ExerciseOptionParams {
   exerciserAccount?: Keypair;
   optionTokenSource: PublicKey;
@@ -32,10 +31,10 @@ export const exerciseOption = async (
     contract.underlyingAmount,
     contract.quoteAmount,
     contract.expiryTs,
-    contract.isCall,
+    contract.isCall.toNumber() === 1,
   ] as const;
 
-  const [claimablePool, claimablePoolBump] = await getProgramAddress(
+  const [claimablePool, claimablePoolBump] = await InertiaSDK.getProgramAddress(
     program,
     "ClaimablePool",
     ...seeds

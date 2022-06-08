@@ -1,4 +1,5 @@
 import * as anchor from "@project-serum/anchor";
+import { BN } from "@project-serum/anchor";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
@@ -94,7 +95,7 @@ export const newContractInstruction = async (
     params.underlyingAmount,
     params.quoteAmount,
     expiryTs,
-    isCall ? new u64(1) : new u64(0),
+    isCall ? new BN(1) : new BN(0),
     contractBump,
     optionBump,
     writerBump,
@@ -127,7 +128,7 @@ export const newContractInstruction = async (
     adminKey: payer,
     oracleAi,
     expiryTs,
-    isCall: isCall ? new u64(1) : new u64(0),
+    isCall: isCall ? new BN(1) : new BN(0),
     underlyingAmount: new anchor.BN(params.underlyingAmount),
     quoteAmount: new anchor.BN(params.quoteAmount),
     key: contract,
@@ -205,7 +206,7 @@ export const newContract = async (
     params.underlyingAmount,
     params.quoteAmount,
     expiryTs,
-    isCall ? new u64(1) : new u64(0),
+    isCall ? new BN(1) : new BN(0),
     contractBump,
     optionBump,
     writerBump,
@@ -239,7 +240,7 @@ export const newContract = async (
     adminKey: admin,
     oracleAi,
     expiryTs,
-    isCall: isCall ? new u64(1) : new u64(0),
+    isCall: isCall ? new BN(1) : new BN(0),
     underlyingAmount: new anchor.BN(params.underlyingAmount),
     quoteAmount: new anchor.BN(params.quoteAmount),
     key: contract,

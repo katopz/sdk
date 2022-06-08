@@ -163,9 +163,9 @@ export class SoloptionsSDK {
         textEncoder.encode(kind),
         underlyingMint.toBuffer(),
         quoteMint.toBuffer(),
-        new u64(underlyingAmount.toString()).toBuffer(),
-        new u64(quoteAmount.toString()).toBuffer(),
-        new u64(expiry.toString()).toBuffer(),
+        underlyingAmount.toBuffer(),
+        quoteAmount.toBuffer(),
+        new BN(expiry.toString()).toBuffer(),
       ],
       program.programId
     );

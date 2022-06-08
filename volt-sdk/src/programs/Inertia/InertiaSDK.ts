@@ -115,8 +115,8 @@ export class InertiaSDK {
     this.network = !opts.network
       ? "mainnet-beta"
       : opts.network === "testnet" || opts.network === "localnet"
-      ? "mainnet-beta"
-      : opts.network;
+        ? "mainnet-beta"
+        : opts.network;
 
     const inertiaIdl = OTHER_IDLS.Inertia;
     if (!inertiaIdl) {
@@ -284,10 +284,10 @@ export class InertiaSDK {
         textEncoder.encode(kind),
         underlyingMint.toBuffer(),
         quoteMint.toBuffer(),
-        new u64(underlyingAmount.toString()).toBuffer(),
-        new u64(quoteAmount.toString()).toBuffer(),
-        new u64(expiry.toString()).toBuffer(),
-        isCall ? new u64(1).toBuffer() : new u64(0).toBuffer(),
+        underlyingAmount.toBuffer(),
+        quoteAmount.toBuffer(),
+        new BN(expiry).toBuffer(),
+        isCall ? new BN(1).toBuffer() : new BN(0).toBuffer(),
       ],
       program.programId
     );

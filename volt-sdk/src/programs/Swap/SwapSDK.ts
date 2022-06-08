@@ -45,8 +45,8 @@ export class SwapSDK {
     this.network = !opts.network
       ? "mainnet-beta"
       : opts.network === "testnet" || opts.network === "localnet"
-      ? "mainnet-beta"
-      : opts.network;
+        ? "mainnet-beta"
+        : opts.network;
 
     const SimpleSwap = new Program(
       OTHER_IDLS.SimpleSwap as Idl,
@@ -135,10 +135,10 @@ export class SwapSDK {
     try {
       const userOrders: SimpleSwapUserOrdersWithKey =
         await sdk.loadUserOrdersByKey(userOrdersKey);
-      orderId = new u64(userOrders.currOrderId);
+      orderId = new BN(userOrders.currOrderId);
     } catch (err) {
       console.log(err);
-      orderId = new u64(0);
+      orderId = new BN(0);
     }
 
     console.log("order id = ", orderId.toString());

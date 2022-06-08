@@ -3,7 +3,7 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { SystemProgram, PublicKey, Keypair } from "@solana/web3.js";
-import { BN, Program, Provider, web3 } from "@project-serum/anchor";
+import { AnchorProvider, BN, Program, Provider, web3 } from "@project-serum/anchor";
 import { getAssociatedTokenAddress } from "../../soloptions-common";
 import { getVaultOwnerAndNonce } from "../../../src";
 
@@ -48,7 +48,7 @@ interface InitializeMarketParams {
 
 export const initializeMarket = async (
   program: Program,
-  provider: Provider,
+  provider: AnchorProvider,
   params: InitializeMarketParams
 ) => {
   // console.log(`HERE IS ${Market.getLayout(params.serumProgram).span}`);

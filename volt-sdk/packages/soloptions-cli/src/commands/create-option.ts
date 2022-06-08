@@ -2,7 +2,6 @@ import { Command, flags } from "@oclif/command";
 import { newContract } from "../../../soloptions-client";
 import { PublicKey } from "@solana/web3.js";
 import { initAnchor } from "../common";
-import parse from "date-fns/parse";
 import chalk from "chalk";
 import * as anchor from "@project-serum/anchor";
 import {
@@ -10,9 +9,7 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { OPTIONS_PROGRAM_IDS, SOLOPTIONS_FEE_OWNER } from "../../../../src";
-import { formatRelativeWithOptions } from "date-fns/fp";
-import { Config, IConfig, load, Options } from "@oclif/config";
+import { SOLOPTIONS_FEE_OWNER } from "../../../../src";
 export default class CreateOption extends Command {
   static description = "Create an option contract";
 
@@ -65,12 +62,10 @@ export default class CreateOption extends Command {
     // const expiry = parse(flags.expiry, "yyyy-MM-dd", new Date());
     const expiryTs = flags.expiry;
     const { program } = initAnchor();
-    console.log(`Creating an option contract for underlying asset mint ${
-      flags.underlying
-    }
-        quote asset mint ${flags.quote} strike: ${
-      flags.underlyingAmount / flags.quoteAmount
-    } at expiry ts ${expiryTs}`);
+    console.log(`Creating an option contract for underlying asset mint ${flags.underlying
+      }
+        quote asset mint ${flags.quote} strike: ${flags.underlyingAmount / flags.quoteAmount
+      } at expiry ts ${expiryTs}`);
     const contract = await newContract(program as any, {
       underlyingMint: new PublicKey(flags.underlying),
       quoteMint: new PublicKey(flags.quote),

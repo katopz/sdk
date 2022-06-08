@@ -2,8 +2,8 @@ import { Command, flags } from "@oclif/command";
 import { cli } from "cli-ux";
 import { getAllContracts } from "../../../soloptions-client";
 import { initAnchor } from "../common";
-import { differenceInDays, format, isSameDay, parse } from "date-fns";
-import { SoloptionsContractWithKey } from "../../../../src/programs/soloptionsTypes";
+import { format, isSameDay, parse } from "date-fns";
+import { SoloptionsContractWithKey } from "../../../../src/programs/Soloptions/soloptionsTypes";
 
 export default class ListOptions extends Command {
   static description = "Create an option contract";

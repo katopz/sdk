@@ -1,8 +1,8 @@
 import * as anchor from "@project-serum/anchor";
 import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { Token, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
-import { Program } from "@project-serum/anchor";
+import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { SoloptionsProgram } from "../../src/programs/Soloptions/soloptionsTypes";
+import { BN } from "bn.js";
 
 export const numToBigEndianByteArray = (
   num: number,
@@ -30,9 +30,9 @@ export const getProgramAddress = async (
       textEncoder.encode(kind),
       underlyingMint.toBuffer(),
       quoteMint.toBuffer(),
-      new u64(underlyingAmount.toString()).toBuffer(),
-      new u64(quoteAmount.toString()).toBuffer(),
-      new u64(expiry.toString()).toBuffer(),
+      underlyingAmount.toBuffer(),
+      quoteAmount.toBuffer(),
+      new BN(expiry).toBuffer(),
     ],
     program.programId
   );
