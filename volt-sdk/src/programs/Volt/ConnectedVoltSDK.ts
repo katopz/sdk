@@ -1,4 +1,4 @@
-import type { I80F48, PerpMarket } from "@friktion-labs/entropy-client";
+import type { PerpMarket } from "@friktion-labs/entropy-client";
 import {
   EntropyClient,
   makeCachePerpMarketsInstruction,
@@ -148,15 +148,15 @@ export class ConnectedVoltSDK extends VoltSDK {
         daoAuthority !== undefined
           ? daoAuthority
           : this.extraVoltData?.isForDao
-          ? this.extraVoltData.daoAuthority
-          : SystemProgram.programId,
+            ? this.extraVoltData.daoAuthority
+            : SystemProgram.programId,
       // NOTE: this field must match the address that is the authority on underlyingTokenSource token account. It is used to generate the pending deposit PDA.
       authorityCheck:
         daoAuthority !== undefined
           ? daoAuthority
           : this.extraVoltData?.isForDao
-          ? this.extraVoltData.daoAuthority
-          : this.wallet,
+            ? this.extraVoltData.daoAuthority
+            : this.wallet,
 
       voltVault: this.voltKey,
       extraVoltData: extraVoltKey,
@@ -255,14 +255,14 @@ export class ConnectedVoltSDK extends VoltSDK {
         daoAuthority !== undefined
           ? daoAuthority
           : this.extraVoltData?.isForDao
-          ? this.extraVoltData.daoAuthority
-          : SystemProgram.programId,
+            ? this.extraVoltData.daoAuthority
+            : SystemProgram.programId,
       authorityCheck:
         daoAuthority !== undefined
           ? daoAuthority
           : this.extraVoltData?.isForDao
-          ? this.extraVoltData.daoAuthority
-          : this.wallet,
+            ? this.extraVoltData.daoAuthority
+            : this.wallet,
       solTransferAuthority: solTransferAuthority
         ? solTransferAuthority
         : this.wallet,
@@ -360,7 +360,7 @@ export class ConnectedVoltSDK extends VoltSDK {
     underlyingTokenDestination: PublicKey,
     daoAuthority?: PublicKey,
     normFactor?: Decimal | undefined,
-    withClaim = false,
+    withClaim = false
   ): Promise<TransactionInstruction> {
     const estimatedTotalWithoutPendingDepositTokenAmount =
       await this.getVoltValueInDepositToken(normFactor);
@@ -462,15 +462,15 @@ export class ConnectedVoltSDK extends VoltSDK {
         daoAuthority !== undefined
           ? daoAuthority
           : this.extraVoltData?.isForDao
-          ? this.extraVoltData.daoAuthority
-          : SystemProgram.programId,
+            ? this.extraVoltData.daoAuthority
+            : SystemProgram.programId,
       // NOTE: this field must match the address that is the authority on underlyingTokenSource token account. It is used to generate the pending deposit PDA.
       authorityCheck:
         daoAuthority !== undefined
           ? daoAuthority
           : this.extraVoltData?.isForDao
-          ? this.extraVoltData.daoAuthority
-          : this.wallet,
+            ? this.extraVoltData.daoAuthority
+            : this.wallet,
 
       vaultMint: this.voltVault.vaultMint,
 
@@ -539,7 +539,7 @@ export class ConnectedVoltSDK extends VoltSDK {
     const {
       roundInfoKey: pendingWithdrawalRoundInfoKey,
       roundUnderlyingPendingWithdrawalsKey:
-        pendingWithdrawalRoundUnderlyingForPendingKey,
+      pendingWithdrawalRoundUnderlyingForPendingKey,
     } = await VoltSDK.findRoundAddresses(
       this.voltKey,
       pendingWithdrawalInfo?.roundNumber ?? new BN(0),
@@ -556,15 +556,15 @@ export class ConnectedVoltSDK extends VoltSDK {
         daoAuthority !== undefined
           ? daoAuthority
           : this.extraVoltData?.isForDao
-          ? this.extraVoltData.daoAuthority
-          : SystemProgram.programId,
+            ? this.extraVoltData.daoAuthority
+            : SystemProgram.programId,
       // NOTE: this field must match the address that is the authority on underlyingTokenSource token account. It is used to generate the pending deposit PDA.
       authorityCheck:
         daoAuthority !== undefined
           ? daoAuthority
           : this.extraVoltData?.isForDao
-          ? this.extraVoltData.daoAuthority
-          : this.wallet,
+            ? this.extraVoltData.daoAuthority
+            : this.wallet,
 
       vaultMint: this.voltVault.vaultMint,
 
@@ -733,8 +733,8 @@ export class ConnectedVoltSDK extends VoltSDK {
     const authority = replacementAuthority
       ? replacementAuthority
       : this.daoAuthority
-      ? this.daoAuthority
-      : this.wallet;
+        ? this.daoAuthority
+        : this.wallet;
     const { pendingDepositInfoKey } = await VoltSDK.findUsefulAddresses(
       this.voltKey,
       this.voltVault,
@@ -787,8 +787,8 @@ export class ConnectedVoltSDK extends VoltSDK {
     const authority = replacementAuthority
       ? replacementAuthority
       : this.daoAuthority
-      ? this.daoAuthority
-      : this.wallet;
+        ? this.daoAuthority
+        : this.wallet;
     const [pendingWithdrawalInfoKey] =
       await VoltSDK.findPendingWithdrawalInfoAddress(
         this.voltKey,
@@ -1275,7 +1275,7 @@ export class ConnectedVoltSDK extends VoltSDK {
 
     const rootBank =
       banks[
-        entropyGroup.getRootBankIndex(entropyGroup.getQuoteTokenInfo().rootBank)
+      entropyGroup.getRootBankIndex(entropyGroup.getQuoteTokenInfo().rootBank)
       ];
     const nodeBank = (await rootBank?.loadNodeBanks(this.connection))?.[0];
 
@@ -1624,13 +1624,13 @@ export class ConnectedVoltSDK extends VoltSDK {
   getPermissionedMarketReferrerPremiumAcct(): PublicKey {
     const referrerPremiumMintAcct =
       this.sdk.net.SERUM_REFERRER_IDS[
-        this.voltVault.permissionedMarketPremiumMint.toString()
+      this.voltVault.permissionedMarketPremiumMint.toString()
       ];
 
     if (!referrerPremiumMintAcct) {
       throw new Error(
         "No referrer acct found for mint: " +
-          this.voltVault.permissionedMarketPremiumMint.toString()
+        this.voltVault.permissionedMarketPremiumMint.toString()
       );
     }
 
@@ -1643,7 +1643,7 @@ export class ConnectedVoltSDK extends VoltSDK {
     if (!referrerQuoteAcct) {
       throw new Error(
         "No referrer acct found for mint: " +
-          this.voltVault.quoteAssetMint.toString()
+        this.voltVault.quoteAssetMint.toString()
       );
     }
 
@@ -2933,12 +2933,12 @@ export class ConnectedVoltSDK extends VoltSDK {
     );
     const oracles = [
       entropyGroup.oracles[
-        entropyGroup.getPerpMarketIndex(this.extraVoltData.powerPerpMarket)
+      entropyGroup.getPerpMarketIndex(this.extraVoltData.powerPerpMarket)
       ],
       entropyGroup.oracles[
-        entropyGroup.getPerpMarketIndex(
-          this.extraVoltData.hedgingSpotPerpMarket
-        )
+      entropyGroup.getPerpMarketIndex(
+        this.extraVoltData.hedgingSpotPerpMarket
+      )
       ],
     ];
 
@@ -2975,7 +2975,7 @@ export class ConnectedVoltSDK extends VoltSDK {
   }
 
   async setupRebalanceEntropy(
-    clientOraclePx?: I80F48
+    clientOraclePx?: Decimal
   ): Promise<TransactionInstruction> {
     const {
       roundVoltTokensKey,
@@ -3118,7 +3118,7 @@ export class ConnectedVoltSDK extends VoltSDK {
 
     const rootBank =
       banks[
-        entropyGroup.getRootBankIndex(entropyGroup.getQuoteTokenInfo().rootBank)
+      entropyGroup.getRootBankIndex(entropyGroup.getQuoteTokenInfo().rootBank)
       ];
     const nodeBank = (await rootBank?.loadNodeBanks(this.connection))?.[0];
 
@@ -3292,7 +3292,7 @@ export class ConnectedVoltSDK extends VoltSDK {
     const { rootBank, nodeBank } = await VoltSDK.getGroupAndBanks(
       entropyClient,
       entropyGroup.publicKey,
-      this.extraVoltData?.depositMint
+      this.voltVault.underlyingAssetMint
     );
 
     const withdrawAssetsFromLendingAccounts: Parameters<
@@ -3390,7 +3390,7 @@ export class ConnectedVoltSDK extends VoltSDK {
 
     const rootBank =
       banks[
-        entropyGroup.getRootBankIndex(entropyGroup.getQuoteTokenInfo().rootBank)
+      entropyGroup.getRootBankIndex(entropyGroup.getQuoteTokenInfo().rootBank)
       ];
     const nodeBank = (await rootBank?.loadNodeBanks(this.connection))?.[0];
 
