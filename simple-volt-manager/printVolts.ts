@@ -37,14 +37,15 @@ cli
   let voltVaults: VoltVaultWithKey[];
 
   const options = cli.opts();
-  if (!options.match) voltVaults = ((await friktionProgram?.account?.voltVault?.all()) as unknown as ProgramAccount<VoltVault>[])
-    .map(
-      (acct) => ({
-        ...acct.account,
-        voltKey: acct.publicKey,
-      })
-    );
-  else {
+  if (!options.match) {
+    voltVaults = ((await friktionProgram?.account?.voltVault?.all()) as unknown as ProgramAccount<VoltVault>[])
+      .map(
+        (acct) => ({
+          ...acct.account,
+          voltKey: acct.publicKey,
+        })
+      );
+  } else {
     const temp = (await friktionProgram.account.voltVault?.fetch(new PublicKey(options.match as string))) as VoltVault;
     voltVaults = [
       {
@@ -66,12 +67,15 @@ cli
     // network: "devnet",
   });
 
-  console.log("match = ", options.match);
+  // console.log("options.pubkey = ", options.pubkey);
+  // console.log("match = ", options.match);
   const voltVault = voltVaults.find((v) => v.voltKey.toString() === options.match);
+  // console.log("voltVault.voltKey = ", voltVault.voltKey.toBase58());
   const vv = await fSdk.loadVoltByKey(voltVault.voltKey);
 
-  console.log('voltVault:', JSON.stringify(voltVault, null, 2));
-  console.log('vv:', vv.voltKey.toString());
+  // console.log('voltVault:', JSON.stringify(voltVault, null, 2));
+  // console.log('vv:', vv.voltKey.toString());
+
 
   let voltsToPrint: VoltSDK[] = [];
   if (options.allVolts) {
@@ -85,7 +89,7 @@ cli
       const structOrNull = await voltSdk.getBalancesForUser(pubkey);
 
       if (!structOrNull) {
-        console.log("skipping...");
+        // console.log("skipping...");
         continue;
       }
 
@@ -100,36 +104,36 @@ cli
         vaultNormFactor,
       } = structOrNull;
 
-      console.log("struct: ", structOrNull);
-      if (totalBalance.gt(0)) {
-        console.log("volt = ", voltSdk.voltKey.toString());
+      console.log("user_balance: ", structOrNull);
+      // if (totalBalance.gt(0)) {
+      //   // console.log("volt = ", voltSdk.voltKey.toString());
 
-        console.log(
-          "underlying mint = ",
-          voltSdk.voltVault.underlyingAssetMint.toString()
-        );
-        console.log(
-          "quote mint = ",
-          voltSdk.voltVault.quoteAssetMint.toString()
-        );
+      //   // console.log(
+      //     "underlying mint = ",
+      //     voltSdk.voltVault.underlyingAssetMint.toString()
+      //   );
+      //   // console.log(
+      //     "quote mint = ",
+      //     voltSdk.voltVault.quoteAssetMint.toString()
+      //   );
 
-        console.log(
-          "total balance: ",
-          new Decimal(totalBalance.toString()).div(normFactor),
-          "normal balance (from vault tokens): ",
-          new Decimal(normalBalance.toString()).div(normFactor),
-          "pending deposit balance: ",
-          new Decimal(pendingDeposits.toString()).div(normFactor),
-          "pending withdrawal balance: ",
-          new Decimal(pendingWithdrawals.toString()).div(normFactor),
-          "mintable shares: ",
-          mintableShares.div(vaultNormFactor).toString(),
-          "claimable underlying: ",
-          claimableUnderlying.div(normFactor).toString()
-        );
-      }
+      //   // console.log(
+      //     "total balance: ",
+      //     new Decimal(totalBalance.toString()).div(normFactor),
+      //     "normal balance (from vault tokens): ",
+      //     new Decimal(normalBalance.toString()).div(normFactor),
+      //     "pending deposit balance: ",
+      //     new Decimal(pendingDeposits.toString()).div(normFactor),
+      //     "pending withdrawal balance: ",
+      //     new Decimal(pendingWithdrawals.toString()).div(normFactor),
+      //     "mintable shares: ",
+      //     mintableShares.div(vaultNormFactor).toString(),
+      //     "claimable underlying: ",
+      //     claimableUnderlying.div(normFactor).toString()
+      //   );
+      // }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
 })()

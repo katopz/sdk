@@ -22,3 +22,7 @@ Existing volts on mainnet:
 - BTC covered calls: CdZ1Mgo3927bsYdKK5rnzGtwek3NLWdvoTSSm2TJjdqW
 - SOL covered calls: CbPemKEEe7Y7YgBmYtFaZiECrVTP5sGrYzrrrviSewKY
 - mSOL (marinade) covered calls: 9RcdLHX8rkfjo4ze2uyvhfQGjX6wAZtbvmBf3aK6wqrG
+
+```
+yarn print --match 2yPs4YTdMzuKmYeubfNqH2xxgdEkXMxVcFWnAFbsojS2 --pubkey FAehHPoVJ8Zi5pEZyn5xTJEYMSbTxRRcTsWupLM9LtNH
+```
